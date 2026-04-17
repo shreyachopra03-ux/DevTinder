@@ -1,0 +1,28 @@
+{
+  "name": "devtinder",
+  "version": "1.0.0",
+  "description": "Tinder for devs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shreyachopra03-ux/DevTinder.git"
+  },
+  "keywords": [
+    "nodejs",
+    "js",
+    "react"
+  ],
+  "author": "Shreya Chopra",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shreyachopra03-ux/DevTinder/issues"
+  },
+  "homepage": "https://github.com/shreyachopra03-ux/DevTinder#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
