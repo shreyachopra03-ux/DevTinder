@@ -1,37 +1,29 @@
 const express = require('express');
 const app = express();
 
+const { adminAuthorization, userAuth } = require("../middlewares/auth");
+
 // We can also wrap the routes inside an array, it will make no difference.
 // app.use("/route", [rH, rH2, rH3, rH4, rH5]);
 
-app.use(
-    "/user",
-    (req, res, next) => {
-        console.log("1st route handler");
-        res.send("1st response handled")
+// GET /users => middleware => request handler
+
+// Handle Auth middleware for all GET, POST...requests
+app.use("/admin", adminAuthorization);
+
+app.use("/user" , userAuth, (req, res, next) => {
+    res.send("user data sent");
+    next();
+});
+
+app.get("/admin/getAllData", (req, res, next) => {
+        res.send("All data sent");
         next();
-    },
-    (req, res, next) => {
-        console.log("2nd route handler");
-        res.send("2nd response handled");
-        next();
-    },
-    (req, res, next) => {
-        console.log("3rd route handler");
-        res.send("3rd response handled");
-        next();
-    },
-    (req, res, next) => {
-        console.log("4th route handler");
-        res.send("4th response handled");
-        next();
-    },
-    (req, res, next) => {
-        console.log("5th route handler");
-        res.send("5th response handled");
-        next();
-    },
-);
+});
+
+app.get("/admin/deleteUser", (req, res) => {
+        res.send("delete the user");
+});
 
 app.listen(7777, () => {
     console.log("Server is listening on port 7777...")
