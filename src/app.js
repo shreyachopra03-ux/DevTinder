@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+require('./config/database');
 
 const { adminAuthorization, userAuth } = require("../middlewares/auth");
 
@@ -31,6 +32,7 @@ app.get("/admin/deleteUser", (req, res) => {
 
 app.use("/", (err, req, res, next) => {
     if(err) {
+        // log your error
         res.status(500).send("Something went wrong");
     }
 });
@@ -48,6 +50,7 @@ app.get("/getUserData", (req, res) => {
 
 app.use("/", (err, req, res, next) => {
     if(err) {
+        // log your error
         res.status(500).send("Something went wrong");
     }
 });
