@@ -3,15 +3,14 @@ const connectDB = require('./config/database');
 const app = express();
 const User = require('./models/user');
 
+// Middleware which converts json data into js object
+app.use(express.json());
+
 app.post("/signup", async(req, res) => {
+    console.log(req.body);
     // Creating a new instance of the User model
-    const user = new User({
-        firstName: "Shreya",
-        lastName: "Chopra",
-        emailId: "shreya050@gmail.com",
-        password: "joabdhsbshs",
-    });
-    
+    const user = new User(req.body);
+
     // Always use try catch block while handling DB
     try{
     await user.save();
