@@ -87,13 +87,23 @@ app.patch("/user", async(req, res) => {
 
 connectDB()
     .then(() => {
-        console.log("Connection was established successfully...")
-        app.listen(7777, () => {
-        console.log("Server is listening on port 7777...")
+        console.log("Database connected...");
+        const server = app.listen(7777, () => {
+            console.log("Server is listening on port 7777...");
+        });
+        server.on('error', (err) => {
+            // EADDRINUSE -> Error: Address Already In Use
+            if (err.code === 'EADDRINUSE') {
+                console.error("Error: Port 7777 is already in use!");
+            } 
+            // If the error isn't regarding busy port, it could be regarding EACCES, Invalid Host, System limits
+            else {
+                console.error("Server error:", err);
+            }
         });
     })
     .catch((err) => {
-        console.err("Connection wasn't established successfully...")
+        console.error("DB Connection failed:", err);
     });
     
 
