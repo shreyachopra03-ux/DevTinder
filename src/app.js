@@ -1,7 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const connectDB = require('./config/database');
 const app = express();
 const User = require('./models/user');
+
+const PORT = process.env.PORT || 7777;
 
 // Middleware which converts json data into js object
 app.use(express.json());
@@ -66,7 +69,8 @@ app.patch("/user", async(req, res) => {
     const data = req.body;
     const userId = req.body.userId;
     try {
-        await User.findByIdAndUpdate({ _id: userId }, data, { returnDocument: "before" });
+        // While updating a user and adding custom made validations, use 'runValidators' flag
+        await User.findByIdAndUpdate({ _id: userId }, data, { returnDocument: "before" , runValidators: true });
         res.send("User updated successfully");
     } catch(err) {
         res.status(400).send("Something went wrong");
@@ -85,26 +89,27 @@ app.patch("/user", async(req, res) => {
     }
 });
 
+function startServer(port) {
+    const server = app.listen(port, () => {
+        console.log(`Server is listening on port ${port}`);
+    });
+
+    server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.log(`Port ${port} is already in use..., so trying ${port + 1}...`);
+            startServer(Number(port) + 1); 
+        } else {
+            console.error("Server error:", err);
+        }
+    });
+}
+
 connectDB()
     .then(() => {
-        console.log("Database connected...");
-        const server = app.listen(7777, () => {
-            console.log("Server is listening on port 7777...");
-        });
-        server.on('error', (err) => {
-            // EADDRINUSE -> Error: Address Already In Use
-            if (err.code === 'EADDRINUSE') {
-                console.error("Error: Port 7777 is already in use!");
-            } 
-            // If the error isn't regarding busy port, it could be regarding EACCES, Invalid Host, System limits
-            else {
-                console.error("Server error:", err);
-            }
-        });
+        console.log("Database connected successfully...");
+        startServer(PORT);
     })
     .catch((err) => {
-        console.error("DB Connection failed:", err);
+        console.error("Database connection failed!");
+        process.exit(1); 
     });
-    
-
-
