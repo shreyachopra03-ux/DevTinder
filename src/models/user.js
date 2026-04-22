@@ -43,7 +43,12 @@ const userSchema = new mongoose.Schema({
         default: "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
     },
     skills: {
-        type: [String]
+        type: [String],
+        validate(value) {
+            if(value.length > 10) {
+                throw new Error("Skills cannot be more than 10");
+            }
+        }
     },
     about: {
         type: String,
