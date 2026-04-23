@@ -3,23 +3,31 @@ const express = require('express');
 const connectDB = require('./config/database');
 const app = express();
 const User = require('./models/user');
-
+const { validateSignupData } = require("./utils/validation");
 const PORT = process.env.PORT || 7777;
 
 // Middleware which converts json data into js object
 app.use(express.json());
 
+// To register a new user
 app.post("/signup", async(req, res) => {
     console.log(req.body);
-    // Creating a new instance of the User model
-    const user = new User(req.body);
-
+  
     // Always use try catch block while handling DB
     try{
-    await user.save();
-    res.send("User added successfully....");
-    } catch (err) {
-        res.status(400).send("error saving the user:" + err.message);
+        // Validate the data
+        validateSignupData(req);
+
+        // Encrypt the password
+        
+
+
+        // Creating a new instance of the User model
+        const user = new User(req.body);
+        await user.save();
+        res.send("User added successfully....");
+        } catch (err) {
+        res.status(400).send("ERROR : " + err.message);
     }
 });
 
