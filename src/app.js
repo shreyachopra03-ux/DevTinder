@@ -5,25 +5,36 @@ const app = express();
 const User = require('./models/user');
 const { validateSignupData } = require("./utils/validation");
 const PORT = process.env.PORT || 7777;
+const bcrypt = require("bcrypt");
 
 // Middleware which converts json data into js object
 app.use(express.json());
 
 // To register a new user
 app.post("/signup", async(req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
   
     // Always use try catch block while handling DB
     try{
+        const { firstName, lastName, emailId, password, gender, age } = req.body;
+
         // Validate the data
         validateSignupData(req);
 
         // Encrypt the password
-        
-
+        const passwordHash = await bcrypt.hash(password, 10);
+        console.log(passwordHash);
 
         // Creating a new instance of the User model
-        const user = new User(req.body);
+        const user = new User({
+            firstName, 
+            lastName, 
+            emailId, 
+            password: passwordHash,
+            gender,
+            age
+        });
+
         await user.save();
         res.send("User added successfully....");
         } catch (err) {
