@@ -6,9 +6,14 @@ const User = require('./models/user');
 const { validateSignupData } = require("./utils/validation");
 const PORT = process.env.PORT || 7777;
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 // Middleware which converts json data into js object
 app.use(express.json());
+
+// Middleware which parses the cookie
+app.use(cookieParser());
 
 // To register a new user
 app.post("/signup", async(req, res) => {
@@ -38,6 +43,63 @@ app.post("/signup", async(req, res) => {
         await user.save();
         res.send("User added successfully....");
         } catch (err) {
+        res.status(400).send("ERROR : " + err.message);
+    }
+});
+
+// To login an existing user
+app.post("/login", async(req, res) => {
+
+    try{
+        const { emailId, password } = req.body;
+        const user = await User.findOne({ emailId: emailId });
+
+        if(!user) {
+            throw new Error("Invalid credentials");
+        } 
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if(isPasswordValid) {
+
+            // Create a JWT token
+            const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET)
+            // console.log(token);
+
+            // Add the token to cookie and send the response back to the user
+            res.cookie("token", token);
+            res.send("Login successful");
+
+        } else {
+            throw new Error("Invalid credentials");
+        }
+    } catch (err) {
+        res.status(400).send("ERROR : " + err.message);
+    }
+});
+
+// Get User's profile
+app.get("/profile", async(req, res) => {
+
+    try{
+    const cookies = req.cookies;
+    
+    const { token } = cookies;
+    if(!token) {
+        throw new Error("Invalid Token");
+    }
+
+    // Validate my token
+    const decodedMessage = await jwt.verify(token, process.env.JWT_SECRET);
+   
+    const { _id } = decodedMessage;
+    console.log("The logged in user is:" + _id);
+
+    const user = await User.findById(_id);
+    if(!user) {
+        throw new Error("User does not exist");
+    }
+    res.send(user);
+    } catch (err) {
         res.status(400).send("ERROR : " + err.message);
     }
 });
