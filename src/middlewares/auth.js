@@ -11,7 +11,7 @@ const userAuth = async (req, res, next) => {
             throw new Error("Token not found");
         }
 
-        const decodedMessage = await jwt.verify(token, process.env.JWT_SECRET, { expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)});
+        const decodedMessage = await jwt.verify(token, process.env.JWT_SECRET);
 
         const { _id } = decodedMessage;
         const user = await User.findById({ _id });
