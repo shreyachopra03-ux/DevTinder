@@ -1,9 +1,10 @@
 require("dotenv").config();
-const jwt = require("jsonwebtoken");
-const User = require("../models/user");
-const cookies = require("cookie-parser")
+import jwt from "jsonwebtoken";
+import User from "../models/user.js";
+import cookies from "cookie-parser";
+import type { Request, Response, NextFunction } from "express";
 
-const userAuth = async (req, res, next) => {
+const userAuth = async (req: any, res: Response, next: NextFunction) => {
     try {
 
         const { token } = req.cookies;
@@ -11,18 +12,18 @@ const userAuth = async (req, res, next) => {
             throw new Error("Token not found");
         }
 
-        const decodedMessage = await jwt.verify(token, process.env.JWT_SECRET);
+        const decodedObj = jwt.verify(token, process.env.JWT_SECRET!) as { _id: string };
 
-        const { _id } = decodedMessage;
+        const { _id } = decodedObj;
         const user = await User.findById({ _id });
         if(!user) {
             throw new Error("User not found");
         }
         req.user = user;
         next();
-    } catch(err) {
-         res.status(400).send("ERROR : " + err.message);
+    } catch(err: any) {
+        (res as any).status(400).send("ERROR : " + err.message);
     }
 }
 
-module.exports = { userAuth };
+export default userAuth;
