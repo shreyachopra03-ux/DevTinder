@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
         required: true,
         lowercase: true,
         unique: true,
-        validate(value) {
+        validate: (value: string) => {
             if(!validator.isEmail(value)) {
                 throw new Error("Invalid Email Address:" + value);
             }
@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         minLength: 8,
-        validate(value) {
+        validate: (value: string) => {
             if(!validator.isStrongPassword(value)) {
                 throw new Error("Not A Strong Password:"+ value);
             }
@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
     gender: {
         type: String,
         required: true,
-        validate(value) {
+        validate: (value: string) => {
             if(!["male", "female", "others"].includes(value)) {
                 throw new Error("Gender data is not valid");
             }
@@ -54,7 +54,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         default: "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png",
-        validate(value) {
+        validate: (value: string) => {
             if(!validator.isURL(value)) {
                 throw new Error("Invalid Photo URL:" + value);
             }
@@ -62,7 +62,7 @@ const userSchema = new mongoose.Schema({
     },
     skills: {
         type: [String],
-        validate(value) {
+        validate: (value: string) => {
             if(value.length > 10) {
                 throw new Error("Skills cannot be more than 10");
             }
@@ -82,11 +82,11 @@ userSchema.methods.getJWT = async function () {
     // 'this' keyword refers to the Document (the specific user data) that you just fetched from the database.
     const user = this;
     
-    const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET!, { expiresIn: '7d' });
     return token;
 };
 
-userSchema.methods.validatePassword = async function (passwordInputByUser) {
+userSchema.methods.validatePassword = async function (passwordInputByUser: string) {
     const user = this;
     const passwordHash = user.password;
 
