@@ -3,6 +3,18 @@ const authRouter = express.Router();
 import bcrypt from 'bcrypt';
 import { validateSignupData } from '../utils/validation';
 import User from '../models/user';
+import type { Request, Response } from 'express';
+
+interface IUser {
+    validatePassword: (password: string) => Promise<boolean>;
+    getJWT: () => Promise<string>;
+    firstName: string;
+    lastName?: string;
+    emailId: string; 
+    password: string;
+    gender: string
+    age: number;
+}
 
 authRouter.post("/signup", async(req, res) => {
     // console.log(req.body);
@@ -30,16 +42,16 @@ authRouter.post("/signup", async(req, res) => {
 
         await user.save();
         res.send("User added successfully....");
-        } catch (err) {
+        } catch (err: any) {
         res.status(400).send("ERROR : " + err.message);
     }
 });
 
-authRouter.post("/login", async(req, res) => {
+authRouter.post("/login", async(req: Request , res: Response) => {
 
     try{
         const { emailId, password } = req.body;
-        const user = await User.findOne({ emailId: emailId });
+        const user = await User.findOne({ emailId: emailId }) as unknown as IUser;
 
         if(!user) {
             throw new Error("Invalid credentials");
@@ -59,9 +71,9 @@ authRouter.post("/login", async(req, res) => {
         } else {
             throw new Error("Invalid credentials");
         }
-    } catch (err) {
+    } catch (err:any) {
         res.status(400).send("ERROR : " + err.message);
     }
 });
 
-module.exports = authRouter;
+export default authRouter;
