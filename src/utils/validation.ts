@@ -1,6 +1,6 @@
 import validator from "validator";
 
-export const validateSignupData = (req) => {
+export const validateSignupData = (req:any) => {
     const { firstName, lastName, emailId, password } = req.body;
     if(!firstName || !lastName) {
         throw new Error("Enter The Name!");
@@ -9,6 +9,4 @@ export const validateSignupData = (req) => {
     } else if(!validator.isStrongPassword(password)) {
         throw new Error("Please Enter Strong Password");
     } 
-}
-
-// export default validateSignupData;
+};
