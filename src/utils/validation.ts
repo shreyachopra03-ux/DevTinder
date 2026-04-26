@@ -1,6 +1,20 @@
 import validator from "validator";
+import type { Request } from "express";
 
-export const validateSignupData = (req:any) => {
+interface IUser {
+    firstName: string;
+    lastName?: string;
+    emailId: string; 
+    password: string;
+    gender: string
+    age: number;
+}
+
+interface AuthRequest extends Request {
+    user?: IUser;
+}
+
+export const validateSignupData = (req: AuthRequest) => {
     const { firstName, lastName, emailId, password } = req.body;
     if(!firstName || !lastName) {
         throw new Error("Enter The Name!");

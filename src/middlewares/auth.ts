@@ -1,10 +1,23 @@
 require("dotenv").config();
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-import cookies from "cookie-parser";
 import type { Request, Response, NextFunction } from "express";
 
-const userAuth = async (req: any, res: Response, next: NextFunction) => {
+interface IUser {
+    firstName: string;
+    lastName?: string | null;
+    emailId: string; 
+    password: string;
+    gender: string
+    age: number;
+}
+
+interface AuthRequest extends Request {
+    user?: IUser;
+}
+
+
+const userAuth = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
 
         const { token } = req.cookies;
@@ -19,7 +32,7 @@ const userAuth = async (req: any, res: Response, next: NextFunction) => {
         if(!user) {
             throw new Error("User not found");
         }
-        req.user = user;
+        req.user = user as unknown as IUser;
         next();
     } catch(err: any) {
         (res as any).status(400).send("ERROR : " + err.message);

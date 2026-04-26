@@ -3,7 +3,20 @@ const profileRouter = express.Router();
 import userAuth from '../middlewares/auth';
 import type { Request, Response } from "express";
 
-profileRouter.get("/profile", userAuth, async(req: any, res: Response) => {
+interface IUser {
+    firstName: string;
+    lastName?: string;
+    emailId: string; 
+    password: string;
+    gender: string
+    age: number;
+}
+
+interface AuthRequest extends Request {
+    user?: IUser;
+}
+
+profileRouter.get("/profile", userAuth, async(req: AuthRequest, res: Response) => {
 
     try{
         const user = req.user;

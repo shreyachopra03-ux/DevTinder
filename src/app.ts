@@ -1,5 +1,5 @@
 import express from 'express';
-import connectDB from './config/database';
+import  connectDB from './config/database';
 const app = express();
 const PORT: number = Number(process.env.PORT) || 7777;
 import cookieParser from "cookie-parser";
