@@ -7,7 +7,7 @@ import authRouter from './routes/auth';
 import profileRouter from './routes/profile';
 import requestRouter from './routes/request';
 
-// Middleware 
+// Middlewares
 app.use(express.json());
 app.use(cookieParser());
 
