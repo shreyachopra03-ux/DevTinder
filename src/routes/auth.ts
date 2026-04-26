@@ -3,6 +3,7 @@ const authRouter = express.Router();
 import bcrypt from 'bcrypt';
 import { validateSignupData } from '../utils/validation.js';
 import User from '../models/user.js';
+import cookie from "cookie-parser";
 import type { Request, Response } from 'express';
 
 interface IUser {
@@ -16,7 +17,7 @@ interface IUser {
     age: number;
 }
 
-authRouter.post("/signup", async(req, res) => {
+authRouter.post("/signup", async(req: Request, res: Response) => {
     // console.log(req.body);
   
     // Always use try catch block while handling DB
@@ -74,6 +75,14 @@ authRouter.post("/login", async(req: Request , res: Response) => {
     } catch (err:any) {
         res.status(400).send("ERROR : " + err.message);
     }
+});
+
+authRouter.post("/logout", async( req: Request, res: Response) => {
+
+    // It invalidates the session by setting the "token" cookie to 'null' and forcing it to expire immediately so the browser deletes it.
+    // { expires: new Date(Date.now()) } means setting the expiration date to right now.
+    res.cookie("token", null, {expires: new Date(Date.now())} );
+    res.send("You have logged out successfully");
 });
 
 export default authRouter;
