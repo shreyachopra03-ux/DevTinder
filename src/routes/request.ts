@@ -1,6 +1,6 @@
 import express from 'express';
 const requestRouter = express.Router();
-import userAuth from '../middlewares/auth';
+import userAuth from '../middlewares/auth.js';
 import type { Request, Response } from "express";
 
 interface IUser {

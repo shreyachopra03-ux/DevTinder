@@ -1,4 +1,4 @@
-require("dotenv").config();
+import "dotenv/config";
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 import type { Request, Response, NextFunction } from "express";

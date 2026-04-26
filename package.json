@@ -6,8 +6,12 @@
   "type": "module",
   "scripts": {
     "start": "node dist/app.js",
-    "dev": "nodemon --exec ts-node-esm src/app.ts",
+    "dev": "nodemon --exec node --loader ts-node/esm src/app.ts",
     "build": "tsc"
+  },
+  "ts-node": {
+    "esm": true,
+    "experimentalResolver": true
   },
   "repository": {
     "type": "git",
