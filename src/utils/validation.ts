@@ -24,3 +24,12 @@ export const validateSignupData = (req: AuthRequest) => {
         throw new Error("Please Enter Strong Password");
     } 
 };
+
+export const validateEditProfile = (req: AuthRequest) => {
+
+    const allowedEditFields = ["skills", "about", "photoUrl", "age"];
+    
+    const isEditAllowed = Object.keys(req.body).every((field) => allowedEditFields.includes(field));
+    return isEditAllowed;
+};
+
