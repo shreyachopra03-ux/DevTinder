@@ -3,10 +3,7 @@ const profileRouter = express.Router();
 import userAuth from '../middlewares/auth.js';
 import type { Request, Response } from "express";
 import { validateEditProfile } from "../utils/validation.js";
-// import bcrypt from "bcrypt";
-// import User from "../models/user.js";
 import crypto from "node:crypto";
-// import jwt from "jsonwebtoken";
 
 interface IUser {
     firstName: string;
@@ -17,7 +14,6 @@ interface IUser {
     age: number;
     passwordResetToken?: string;
     resetExpireTime?: number;
-    save?: 
 }
 
 interface AuthRequest extends Request {
@@ -57,7 +53,7 @@ profileRouter.post("/profile/edit", userAuth, async (req: AuthRequest, res: Resp
     }
 });
 
-profileRouter.patch("/profile/password", userAuth, async(req: AuthRequest, res: Response) => {
+profileRouter.patch("/profile/password", async(req: AuthRequest, res: Response) => {
     try {
         const user = req.user;
         if(!user) {
@@ -75,6 +71,8 @@ profileRouter.patch("/profile/password", userAuth, async(req: AuthRequest, res: 
 
         // Send reset password mail to the user
         res.send("https://yourfrontend.com/reset-password?token=token");
+
+
 
     } catch (err: any) {
         res.status(400).send("ERROR : " + err.message);
