@@ -6,6 +6,7 @@ import { validateEditProfile } from "../utils/validation.js";
 import crypto from "node:crypto";
 import User from "../models/user.js";
 import { Document } from "mongoose";
+import { resend } from "../utils/email.js";
 
 interface IUser extends Document {
     firstName: string;
@@ -15,7 +16,7 @@ interface IUser extends Document {
     gender: string;
     age: number;
     passwordResetToken?: string;
-    resetExpireTime?: number;
+    resetExpiryTime?: number;
 }
 
 interface AuthRequest extends Request {
@@ -55,30 +56,76 @@ profileRouter.post("/profile/edit", userAuth, async (req: AuthRequest, res: Resp
     }
 });
 
+// forgot-password API
+// user submits their mail
 profileRouter.patch("/profile/forgot-password", async(req: AuthRequest, res: Response) => {
+
     try {
         const { emailId } = req.body;
-
         const user = await User.findOne({ emailId : emailId }) as IUser;
         if(!user) {
-            res.send(404).send("No user found with this email !")
+            res.send(404).send("If this email exists, a link has been sent!")
         }
 
         // For generating a secure random token 
         const rawResetToken = crypto.randomBytes(32).toString("hex");
         // console.log(resetToken);
 
+        // Storing hash of the rawResetToken in the DB, with its expiry time (15 mins)
         user.passwordResetToken = crypto.createHash('sha256').update(rawResetToken).digest("hex");
-        user.resetExpireTime = Date.now() + 15 * 60 * 1000;
+        user.resetExpiryTime = Date.now() + 15 * 60 * 1000;
         await user.save();
 
-        // Send reset password mail to the user
-        const resetUrl = `https://devtinder.fun/reset-password?token=${rawResetToken}`;
+        // Send email with a link containing the token
+        const resetLink = `https://devtinder.fun/reset-password?token=${rawResetToken}`;
 
+        await resend.emails.send ({
+            from: 'support@devtinder.fun',
+            to: emailId,
+            subject: 'Reset your password',
+            html: 
+            `<<p>Click here to reset your password:</p>
+            <a href="${resetLink}">Reset Password</a>
+            <p>This link expires in 15 minutes.</p>
+            <p>If you didn't request this, ignore this email.</p>` 
+        });
     } catch (err: any) {
         res.status(400).send("ERROR : " + err.message);
     }
 });
+
+// user clicks the link in their mail
+profileRouter.get("/profile/reset-password", async(req: AuthRequest, res: Response) => {
+
+    try {
+        const { rawResetToken } = req.query;
+
+        const resetRecord = await User.findResetToken(rawResetToken);
+
+        if(!resetRecord) {
+            throw new Error("Invalid or expired link")
+        }
+
+
+
+    } catch (err: any) {
+        res.status(400).send("ERROR : " + err.message);
+
+    }
+
+}); 
+
+// user submits their new password
+profileRouter.post("/profile/reset-password", async(req: AuthRequest, res: Response) => {
+    try {
+
+    } catch (err) {
+        res.status(400).send("ERROR : " + err.message);
+
+    }
+});
+
+
 
 export default profileRouter;
 
