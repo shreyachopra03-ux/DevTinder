@@ -4,13 +4,15 @@ import userAuth from '../middlewares/auth.js';
 import type { Request, Response } from "express";
 import { validateEditProfile } from "../utils/validation.js";
 import crypto from "node:crypto";
+import User from "../models/user.js";
+import { Document } from "mongoose";
 
-interface IUser {
+interface IUser extends Document {
     firstName: string;
     lastName?: string;
     emailId: string; 
     password: string;
-    gender: string
+    gender: string;
     age: number;
     passwordResetToken?: string;
     resetExpireTime?: number;
@@ -53,26 +55,25 @@ profileRouter.post("/profile/edit", userAuth, async (req: AuthRequest, res: Resp
     }
 });
 
-profileRouter.patch("/profile/password", async(req: AuthRequest, res: Response) => {
+profileRouter.patch("/profile/forgot-password", async(req: AuthRequest, res: Response) => {
     try {
-        const user = req.user;
+        const { emailId } = req.body;
+
+        const user = await User.findOne({ emailId : emailId }) as IUser;
         if(!user) {
-            throw new Error("User not found");
+            res.send(404).send("No user found with this email !")
         }
 
         // For generating a secure random token 
-        const resetToken = crypto.randomBytes(20).toString("hex");
-        console.log(resetToken);
+        const rawResetToken = crypto.randomBytes(32).toString("hex");
+        // console.log(resetToken);
 
-        user.passwordResetToken = resetToken;
+        user.passwordResetToken = crypto.createHash('sha256').update(rawResetToken).digest("hex");
         user.resetExpireTime = Date.now() + 15 * 60 * 1000;
-
         await user.save();
 
         // Send reset password mail to the user
-        res.send("https://yourfrontend.com/reset-password?token=token");
-
-
+        const resetUrl = `https://devtinder.fun/reset-password?token=${rawResetToken}`;
 
     } catch (err: any) {
         res.status(400).send("ERROR : " + err.message);
