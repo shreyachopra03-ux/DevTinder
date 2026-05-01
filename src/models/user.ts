@@ -72,6 +72,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "This is user's default about",
         maxLength: 500
+    },
+    passwordResetToken: {
+        type: String,
+        default: null
+    },
+    resetExpiryTime: {
+        type: String,
+        default: null
     }
 }, {
     timestamps: true
