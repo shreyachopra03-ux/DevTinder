@@ -112,10 +112,10 @@ profileRouter.get("/profile/reset-password", async(req: AuthRequest, res: Respon
 
         const hashedToken = crypto.createHash('sha256').update(rawResetToken as string).digest("hex");
         const user = await User.findOne({ passwordResetToken: hashedToken }) as IUser;
-        console.log(user);
+        // console.log(user);
 
         if(!user) {
-            console.log("user not found");
+            // console.log("user not found");
             throw new Error("Invalid or expired link");
         }
 
