@@ -78,7 +78,7 @@ const userSchema = new mongoose.Schema({
         default: null
     },
     resetExpiryTime: {
-        type: String,
+        type: Number,
         default: null
     }
 }, {
