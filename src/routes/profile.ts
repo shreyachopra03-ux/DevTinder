@@ -65,7 +65,7 @@ profileRouter.post("/profile/forgot-password", async(req: AuthRequest, res: Resp
         const { emailId } = req.body;
         const user = await User.findOne({ emailId : emailId }) as IUser;
         if(!user) {
-            return res.send(404).send("If this email exists, a link has been sent!")
+            return res.status(404).json({ message: "If this email exists, a link has been sent!" })
         }
 
         // For generating a secure random token 
@@ -75,7 +75,12 @@ profileRouter.post("/profile/forgot-password", async(req: AuthRequest, res: Resp
         // Storing hash of the rawResetToken in the DB, with its expiry time (15 mins)
         user.passwordResetToken = crypto.createHash('sha256').update(rawResetToken).digest("hex");
         user.resetExpiryTime = Date.now() + 15 * 60 * 1000;
-        await user.save();
+        await user.save({ validateBeforeSave: false });
+
+        console.log("Saved, now check DB");
+
+        const checkUser = await User.findById(user._id);
+        console.log("DB token:", checkUser?.passwordResetToken);
 
         // Send email with a link containing the token
         const resetLink = `https://devtinder.fun/reset-password?token=${rawResetToken}`;
@@ -85,7 +90,7 @@ profileRouter.post("/profile/forgot-password", async(req: AuthRequest, res: Resp
             to: emailId,
             subject: 'Reset your password',
             html: 
-            `<<p>Click here to reset your password:</p>
+            `<p>Click here to reset your password:</p>
             <a href="${resetLink}">Reset Password</a>
             <p>This link expires in 15 minutes.</p>
             <p>If you didn't request this, ignore this email.</p>` 
@@ -100,7 +105,7 @@ profileRouter.post("/profile/forgot-password", async(req: AuthRequest, res: Resp
 profileRouter.get("/profile/reset-password", async(req: AuthRequest, res: Response) => {
 
     try {
-        const { rawResetToken } = req.query;
+        const rawResetToken = req.query.rawResetToken || req.query.token; ;
         if(!rawResetToken) {
             throw new Error("Token missing!!")
         }
@@ -110,7 +115,7 @@ profileRouter.get("/profile/reset-password", async(req: AuthRequest, res: Respon
         console.log(user);
 
         if(!user) {
-            console.log("yr user ni mil reya");
+            console.log("user not found");
             throw new Error("Invalid or expired link");
         }
 
