@@ -1,12 +1,11 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const connectionRequestSchema = new mongoose.Schema({
-    
-    toUserId: {
+    fromUserId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
-    fromUserId: {
+    toUserId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
@@ -15,14 +14,12 @@ const connectionRequestSchema = new mongoose.Schema({
         required: true,
         enum: {
             values: ["ignored", "interested", "accepted", "rejected"],
-            message: `{VALUES} is not a valid value type`
+            message: `{VALUE} is not the correct status type`
         }
     }
-},  {
+}, {
     timestamps: true
-    }
-);
+});
 
-const ConnectionRequestModel = mongoose.model("ConnectionRequestModel", connectionRequestSchema);
-
+const ConnectionRequestModel = mongoose.model("ConnectionRequest", connectionRequestSchema);
 module.exports = ConnectionRequestModel;
