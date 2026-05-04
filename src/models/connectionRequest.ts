@@ -12,6 +12,7 @@ const connectionRequestSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
+        // enum is used when we want to restrict the user only to some certain values.
         enum: {
             values: ["ignored", "interested", "accepted", "rejected"],
             message: `{VALUE} is not the correct status type`
@@ -21,5 +22,6 @@ const connectionRequestSchema = new mongoose.Schema({
     timestamps: true
 });
 
-const ConnectionRequestModel = mongoose.model("ConnectionRequest", connectionRequestSchema);
-module.exports = ConnectionRequestModel;
+const ConnectionRequest = mongoose.model("ConnectionRequest", connectionRequestSchema);
+
+export default ConnectionRequest;
