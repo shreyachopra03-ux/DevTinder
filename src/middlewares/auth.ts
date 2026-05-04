@@ -16,7 +16,6 @@ interface AuthRequest extends Request {
     user?: IUser;
 }
 
-
 const userAuth = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
 
@@ -37,6 +36,6 @@ const userAuth = async (req: AuthRequest, res: Response, next: NextFunction) => 
     } catch(err: any) {
         (res as any).status(400).send("ERROR : " + err.message);
     }
-}
+};
 
 export default userAuth;
