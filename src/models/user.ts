@@ -86,6 +86,9 @@ const userSchema = new mongoose.Schema({
    }
 );
 
+// Compound Indexing 
+userSchema.index({ firstName: 1, lastName: 1 });
+
 userSchema.methods.getJWT = async function () {
     // 'this' keyword refers to the Document (the specific user data) that you just fetched from the database.
     const user = this;
@@ -103,4 +106,5 @@ userSchema.methods.validatePassword = async function (passwordInputByUser: strin
 };
 
 const User = mongoose.model("User", userSchema);
+
 export default User;
