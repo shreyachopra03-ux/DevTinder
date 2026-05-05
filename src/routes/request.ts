@@ -27,7 +27,7 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req: Auth
         const toUserId = req.params.toUserId;
         const status = req.params.status as string;
 
-        // 1st corner case
+        // 1st corner case -> Only status ignored/interested can be sent as params in the url.
         const allowedStatus = ["ignored", "interested"];
         if(!allowedStatus.includes(status)) {
             return res
@@ -35,7 +35,7 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req: Auth
             .json({ message: "Invalid status type : " + status });
         }
 
-        // 2nd corner case
+        // 2nd corner case -> If the user isn't available on the devTinder platform then randomly connection req to any other user of any other platform can not be sent !
         const toUser = await User.findById(toUserId);
         if (!toUser) {
             return res.status(404).json({ message: "User not found !!"});
