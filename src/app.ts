@@ -7,14 +7,17 @@ import cookieParser from "cookie-parser";
 import authRouter from './routes/auth.js';
 import profileRouter from './routes/profile.js';
 import requestRouter from './routes/request.js';
+import userRouter from "./routes/user.js";
 
 // Middlewares
 app.use(express.json());
 app.use(cookieParser());
 
+// Routers
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
+app.use("/", userRouter);
 
 function startServer(port: number) {
     const server = app.listen(port, () => {
@@ -30,7 +33,7 @@ function startServer(port: number) {
             console.error("Server error:", err);
         }
     });
-}
+};
 
 connectDB()
     .then(() => {
