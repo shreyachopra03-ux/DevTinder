@@ -14,6 +14,7 @@ interface IUser {
     age: number;
     _id: string;
     status?: string;
+    loggedInUser?: string
 }
 
 interface AuthRequest extends Request {
@@ -24,12 +25,11 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req: Auth
 
     try {
         const fromUserId = req.user?._id;
-        const toUserId = req.params.toUserId;
-        const status = req.params.status as string;
+        const { toUserId, status } = req.params;
 
         // 1st corner case -> Only status ignored/interested can be sent as params in the url.
         const allowedStatus = ["ignored", "interested"];
-        if(!allowedStatus.includes(status)) {
+        if(!allowedStatus.includes(status as string)) {
             return res
             .status(400)
             .json({ message: "Invalid status type : " + status });
@@ -67,6 +67,50 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req: Auth
         });
     } catch (err: any) {
         res.status(400).send("ERROR : " + err.message)
+    }
+});
+
+requestRouter.post("/request/review/:status/:requestId", userAuth, async (req: AuthRequest, res:Response) => {
+
+    try {
+    const loggedInUser = req.user;
+    console.log(loggedInUser);
+    const { status, requestId } = req.params;
+    console.log(requestId);
+
+    // 1st corner case
+    const allowedStatus = ["rejected", "accepted"];
+    if(!allowedStatus.includes(status as string)) {
+        return res.status(400).json({ message: "Invalid status type !!"})
+    }
+
+    if(!loggedInUser) {
+      return res.status(401).send("Please Login!");
+    }
+
+    const connectionRequest = await ConnectionRequest.findOne({
+        _id: requestId,
+        toUserId: loggedInUser._id,
+        status: "interested"
+    });
+    console.log()
+
+    if(!connectionRequest) {
+        return res.status(404).json({ message: "Connection request not found !"})
+    }
+
+    // Explicitly telling TS that status can only be of 2 types
+    connectionRequest.status = status as "rejected" | "accepted";
+
+    const data = await connectionRequest.save();
+    
+    return res.json({ 
+        message: "Connection request " + status,
+        data
+    });
+
+    } catch (err: any) {
+        return res.status(400).send("ERROR : " + err.message)
     }
 });
 
