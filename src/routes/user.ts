@@ -42,4 +42,35 @@ userRouter.get("/user/requests/received", userAuth, async(req: AuthRequest, res:
     }
 });
 
+userRouter.get("/user/connections", userAuth, async(req: AuthRequest, res: Response) => {
+
+    try {
+        const loggedInUser = req.user;
+
+        if(!loggedInUser) {
+            throw new Error("Please login!")
+        }
+
+        const connectionRequests = await ConnectionRequest.find({
+            $or: [
+                { fromUserId: loggedInUser._id , status: "accepted" },
+                { toUserId: loggedInUser._id, status: "accepted" }
+            ]
+        })
+        .populate("fromUserId", ["firstName", "lastName", "age", "gender", "skills", "about", "photoUrl"])
+        .populate("toUserId", ["firstName", "lastName", "age", "gender", "skills", "about", "photoUrl"]);
+
+        console.log(connectionRequests);
+
+        const data = connectionRequests.map((row) => {
+            if(row.fromUserId._id.toString() === loggedInUser._id.toString()) {
+                return row.toUserId;
+            }
+            return row.fromUserId;
+        });
+    } catch (err: any) {
+        res.status(400).send("ERROR : " + err.message);
+    }
+});
+
 export default userRouter;
