@@ -3,6 +3,8 @@ const userRouter = express.Router();
 import type { Request, Response } from "express";
 import userAuth from "../middlewares/auth.js";
 import ConnectionRequest from "../models/connectionRequest.js";
+import User from "../models/user.js";
+const USER_SAFE_DATA = "firstName lastName age gender skills about photoUrl";
 
 interface IUser {
     firstName: string;
@@ -68,6 +70,41 @@ userRouter.get("/user/connections", userAuth, async(req: AuthRequest, res: Respo
             }
             return row.fromUserId;
         });
+    } catch (err: any) {
+        res.status(400).send("ERROR : " + err.message);
+    }
+});
+
+userRouter.get("/user/feed", userAuth, async(req: AuthRequest, res: Response) => {
+
+    try{
+        const loggedInUser = req.user;
+
+        if(!loggedInUser) {
+            throw new Error("User not found");
+        }
+
+        const connectionRequests = await ConnectionRequest.find({
+            $or: [
+                { fromUserId: loggedInUser._id },
+                { toUserId: loggedInUser._id }
+            ],
+        }).select("fromUserId toUserId");
+
+        const hiddenUsersFromFeed = new Set();
+        connectionRequests.forEach((req) => {
+            hiddenUsersFromFeed.add(req.fromUserId.toString());
+            hiddenUsersFromFeed.add(req.toUserId.toString());
+        });
+    
+        const users = await User.find({
+        $and: [
+        { _id: { $nin: Array.from(hiddenUsersFromFeed) as string[] } },
+        { _id: { $ne: loggedInUser._id } },
+        ],
+        }).select(USER_SAFE_DATA);
+
+    res.send(users);
     } catch (err: any) {
         res.status(400).send("ERROR : " + err.message);
     }
