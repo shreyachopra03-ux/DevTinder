@@ -110,7 +110,7 @@ userRouter.get("/user/feed", userAuth, async(req: AuthRequest, res: Response) =>
         ],
         }).select(USER_SAFE_DATA).skip(skip).limit(limit);
 
-    res.send(users);
+    res.json({ data: users });
     } catch (err: any) {
         res.status(400).send("ERROR : " + err.message);
     }
