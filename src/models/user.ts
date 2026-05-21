@@ -7,8 +7,8 @@ const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
         required: true,
-        minLength: 2,
-        maxLength: 50,
+        minlength: 2,
+        maxlength: 50,
         trim: true
     },
     lastName: {
@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minLength: 8,
+        minlength: 8,
         validate: (value: string) => {
             if(!validator.isStrongPassword(value)) {
                 throw new Error("Not A Strong Password:"+ value);
@@ -71,7 +71,7 @@ const userSchema = new mongoose.Schema({
     about: {
         type: String,
         default: "This is user's default about",
-        maxLength: 500
+        maxlength: 500
     },
     passwordResetToken: {
         type: String,
