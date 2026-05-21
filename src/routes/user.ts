@@ -79,6 +79,12 @@ userRouter.get("/user/feed", userAuth, async(req: AuthRequest, res: Response) =>
 
     try{
         const loggedInUser = req.user;
+        console.log(loggedInUser);
+
+        const page = parseInt(req.query.page as string) || 1;
+        let limit = parseInt(req.query.limit as string) || 10;
+        limit = limit > 50 ? 50 : limit;
+        const skip = (page-1) * limit;
 
         if(!loggedInUser) {
             throw new Error("User not found");
@@ -102,7 +108,7 @@ userRouter.get("/user/feed", userAuth, async(req: AuthRequest, res: Response) =>
         { _id: { $nin: Array.from(hiddenUsersFromFeed) as string[] }},
         { _id: { $ne: loggedInUser._id } },
         ],
-        }).select(USER_SAFE_DATA);
+        }).select(USER_SAFE_DATA).skip(skip).limit(limit);
 
     res.send(users);
     } catch (err: any) {
