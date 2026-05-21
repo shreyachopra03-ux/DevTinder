@@ -1,7 +1,12 @@
 const NavBar = () => {
     return (
     <div className="navbar bg-base-300 shadow-sm">
+         <img
+        className="flex h-10 w-10"
+        src="https://static.vecteezy.com/system/resources/previews/023/986/928/non_2x/tinder-app-logo-tinder-app-logo-transparent-tinder-app-icon-transparent-free-free-png.png"
+        alt="dev tinder logo"/>
     <div className="flex-1">
+       
     <a className="btn btn-ghost text-xl">DEV TINDER</a>
     </div>
     <div className="flex gap-2">
