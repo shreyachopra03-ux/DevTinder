@@ -30,6 +30,9 @@ export const validateEditProfile = (req: AuthRequest) => {
     const allowedEditFields = ["skills", "about", "photoUrl", "age"];
     
     const isEditAllowed = Object.keys(req.body).every((field) => allowedEditFields.includes(field));
-    return isEditAllowed;
+
+    if(!isEditAllowed) {
+        throw new Error("Invalid fields for edit: " + Object.keys(req.body).filter(field => !allowedEditFields.includes(field)).join(", "));
+    }
 };
 

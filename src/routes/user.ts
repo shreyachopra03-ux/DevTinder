@@ -70,6 +70,8 @@ userRouter.get("/user/connections", userAuth, async(req: AuthRequest, res: Respo
             }
             return row.fromUserId;
         });
+
+        res.json({ data });
     } catch (err: any) {
         res.status(400).send("ERROR : " + err.message);
     }

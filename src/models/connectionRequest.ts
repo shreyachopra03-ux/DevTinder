@@ -27,13 +27,11 @@ const connectionRequestSchema = new mongoose.Schema({
 // Compound Indexing: It means that when we will query with both these parameters (fromUserId & toUserId) there response will become very fast.
 connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 });
 
-connectionRequestSchema.pre("save", function (next: any) {
+connectionRequestSchema.pre("save", async function () {
   const connectionRequest = this;
   if (connectionRequest.fromUserId.equals(connectionRequest.toUserId)) {
-     // check if fromUserId equals to toUserId
-     return new Error("Cannot send connection request to yourself !!");
+     throw new Error("Cannot send connection request to yourself !!");
   }
-//   next();
 });
 
 const ConnectionRequest = mongoose.model("ConnectionRequest", connectionRequestSchema);
