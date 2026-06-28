@@ -40,7 +40,7 @@ export default function Profile() {
     );
   }
 
-  const handleSave = async (e: React.FormEvent) => {
+   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setMsg('');
@@ -50,21 +50,24 @@ export default function Profile() {
         .map((s) => s.trim())
         .filter(Boolean);
 
+      const body: Record<string, any> = {
+        ...formData,
+        skills: formattedSkills
+      };
+      if (!body.photoUrl) delete body.photoUrl;
+
       const res = await axios.post(
         BASE_URL + "/profile/edit",
-        {
-          ...formData,
-          skills: formattedSkills
-        },
+        body,
         { withCredentials: true }
       );
 
       dispatch(addUser(res.data.data));
       setMsgType('success');
       setMsg("Profile updated successfully!");
-    } catch (err) {
+    } catch (err: any) {
       setMsgType('error');
-      setMsg("Error updating profile");
+      setMsg(err?.response?.data || "Error updating profile");
       console.error(err);
     } finally {
       setSaving(false);
