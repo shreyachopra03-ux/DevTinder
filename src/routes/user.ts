@@ -105,12 +105,23 @@ userRouter.get("/user/feed", userAuth, async(req: AuthRequest, res: Response) =>
             hiddenUsersFromFeed.add(req.toUserId.toString());
         });
     
-        const users = await User.find({
+        const oppositeGender = loggedInUser.gender === "male" ? "female" : loggedInUser.gender === "female" ? "male" : { $in: ["male", "female"] };
+        let users = await User.find({
         $and: [
         { _id: { $nin: Array.from(hiddenUsersFromFeed) as string[] }},
         { _id: { $ne: loggedInUser._id } },
+        { gender: oppositeGender },
         ],
         }).select(USER_SAFE_DATA).skip(skip).limit(limit);
+
+        if (users.length === 0 && loggedInUser.gender !== "others") {
+            users = await User.find({
+                $and: [
+                    { _id: { $nin: Array.from(hiddenUsersFromFeed) as string[] }},
+                    { _id: { $ne: loggedInUser._id } },
+                ],
+            }).select(USER_SAFE_DATA).skip(skip).limit(limit);
+        }
 
     res.json({ data: users });
     } catch (err: any) {
