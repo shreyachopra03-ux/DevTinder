@@ -10,6 +10,9 @@
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
+  input, textarea, select {
+    color: #0f172a !important;
+  }
 }
 
 @layer utilities {
