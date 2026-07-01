@@ -22,7 +22,7 @@ authRouter.post("/signup", async(req: Request, res: Response) => {
   
     // Always use try catch block while handling DB
     try{
-        const { firstName, lastName, emailId, password, gender, age } = req.body;
+        const { firstName, lastName, emailId, password, gender, age, photoUrl } = req.body;
 
         // Validate the data
         validateSignupData(req);
@@ -32,14 +32,18 @@ authRouter.post("/signup", async(req: Request, res: Response) => {
         console.log(passwordHash);
 
         // Creating a new instance of the User model
-        const user = new User({
+        const userData: Record<string, any> = {
             firstName, 
             lastName, 
             emailId, 
             password: passwordHash,
             gender,
-            age
-        });
+            age,
+        };
+        if (photoUrl) {
+            userData.photoUrl = photoUrl;
+        }
+        const user = new User(userData);
 
         await user.save();
 
@@ -47,6 +51,9 @@ authRouter.post("/signup", async(req: Request, res: Response) => {
         res.cookie("token", token, { expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)});
         res.send(user);
         } catch (err: any) {
+        if (err?.code === 11000) {
+            return res.status(400).send("Email already exists");
+        }
         res.status(400).send("ERROR : " + err.message);
     }
 });
