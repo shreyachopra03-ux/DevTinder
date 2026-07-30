@@ -126,7 +126,7 @@ const Feed = () => {
         >
           <div className="relative h-96 w-full bg-slate-900">
             <img
-              src={currentDev.photoUrl}
+              src={currentDev.photoUrl || "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"}
               alt="avatar"
               className="w-full h-full object-cover"
               onError={(e) => { (e.target as HTMLImageElement).src = "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"; }}
