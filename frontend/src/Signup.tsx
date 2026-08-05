@@ -7,7 +7,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 const Signup = () => {
   const [form, setForm] = useState({
-    firstName: "", lastName: "", emailId: "", password: "", gender: "male", age: 18, photoUrl: ""
+    firstName: "", lastName: "", emailId: "", password: "", gender: "male", age: 18
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -92,13 +92,6 @@ const Signup = () => {
                   <option value="others">Others</option>
                 </select>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1.5">Photo URL</label>
-              <input type="text" name="photoUrl" value={form.photoUrl} onChange={handleChange}
-                placeholder="https://example.com/photo.jpg"
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:border-violet-500 focus:bg-white outline-none rounded-xl text-sm text-slate-900 transition" />
             </div>
 
             <button
